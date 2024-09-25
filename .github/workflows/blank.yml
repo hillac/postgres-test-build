@@ -20,35 +20,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libreadline-dev zlib1g-dev flex bison libssl-dev
 
-      - name: Clone PostgreSQL Source Code
+      - name: Clone PostgreSQL Source Code and Build
         run: |
           git clone --depth=1 https://github.com/postgres/postgres.git
           cd postgres
           ./configure --prefix=$HOME/pg_build --with-openssl
           make -j$(nproc)
           make install
-      
-      # Debug step to list the build directory
-      - name: List Build Directory
-        run: |
-          echo "Listing the contents of $HOME/pg_build"
-          ls -al $HOME/pg_build
 
       # Archive the binaries
       - name: Package Binaries
         run: |
           cd $HOME/pg_build
           tar -czf postgres-binaries.tar.gz *
-          echo "Listing the contents after tar:"
-          ls -al $HOME/pg_build
-
-      # - name: Package Binaries
-      #   run: |
-      #     cd $HOME/pg_build
-      #     tar -czf postgres-binaries.tar.gz *
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: postgres-binaries
-          path: $HOME/pg_build/postgres-binaries.tar.gz
+          path: /home/runner/pg_build/postgres-binaries.tar.gz
