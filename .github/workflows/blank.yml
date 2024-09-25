@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: postgres-binaries
-          path: ${{ github.workspace }}/pg_build/postgres-binaries.tar.gz
+          path: /home/runner/pg_build/postgres-binaries.tar.gz
