@@ -1,0 +1,40 @@
+name: Build PostgreSQL from Source
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libreadline-dev zlib1g-dev flex bison libssl-dev
+
+      - name: Clone PostgreSQL Source Code
+        run: |
+          git clone --depth=1 https://github.com/postgres/postgres.git
+          cd postgres
+          ./configure --prefix=$HOME/pg_build --with-openssl
+          make -j$(nproc)
+          make install
+
+      - name: Package Binaries
+        run: |
+          cd $HOME/pg_build
+          tar -czf postgres-binaries.tar.gz *
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: postgres-binaries
+          path: $HOME/pg_build/postgres-binaries.tar.gz
